@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppRouter from "./Router";
-import {authService} from "../fBase";
+import { authService } from "../fBase";
 
 function App() {
-  const [isLoggedIn, setLoggedIn] = useState(authService.currentUser);
-  setInterval(() => {
-    console.log(authService.currentUser);
-  }, 2000);
+  const [init, setInit] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(authService.currentUser);
+  useEffect(() => {
+    authService.onAuthStateChanged((user) => {
+      if (user) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+      setInit(true);
+    });
+  }, []);
   return (
     <>
-      <AppRouter isLoggedIn={isLoggedIn} />
+      {init ? <AppRouter isLoggedIn={isLoggedIn} /> : "Initializing..."}
       <footer>&copy;{new Date().getFullYear()} Switter</footer>
     </>
   )
